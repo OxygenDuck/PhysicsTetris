@@ -5,25 +5,19 @@ using UnityEngine.UI;
 
 public class Playfield : MonoBehaviour
 {
-    // The Grid itself
+    //PhysicsTetris
+    //Programming by Peter Janssen
+    //5 november 2019
+
+    //Variables
     public static int w = 10;
     public static int h = 20;
-    public static Transform[,] grid = new Transform[w, h];
     public static int score = 0;
     public static int level = 1;
     public static float lastSwap = 0;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public static bool gameOver = false;
+    public static Transform[,] grid = new Transform[w, h];
+    public static List<GameObject> gridItems = new List<GameObject>();
 
     //Update score and level label
     private static void UpdateLabels()
@@ -41,16 +35,17 @@ public class Playfield : MonoBehaviour
         level++;
     }
 
-    public static double CalculateLevelSpeed()
+    //Calculate speed for falling groups
+    public static float CalculateLevelSpeed()
     {
         if (level >= 20)
         {
-            return 1 / (0.05 * 20);
+            return 1.5f;
         }
-        return 1 - (0.05 * level);
+        return 0.5f + (0.05f * level) - 0.05f;
     }
 
-    //Round
+    //Round Vector2 classes
     public static Vector2 RoundVec2(Vector2 v)
     {
         return new Vector2(Mathf.Round(v.x), Mathf.Round(v.y));
@@ -133,5 +128,30 @@ public class Playfield : MonoBehaviour
         }
 
         UpdateLabels();
+
+        //DEBUG show position of grid items
+        foreach (GameObject item in gridItems)
+        {
+            Destroy(item);
+        }
+        gridItems.Clear();
+
+        for (int x = 0; x < w; x++)
+        {
+            for (int y = 0; y < h; y++)
+            {
+                if (grid[x, y] != null)
+                {
+                    gridItems.Add((GameObject)Instantiate(Resources.Load("debugBlock"), new Vector3(x, y, -1), new Quaternion()));
+                }
+            }
+        }
     }
+
+    //Show a game over screen
+    public static void ShowGameOver()
+    {
+        Instantiate(Resources.Load("gameOverScreen"), GameObject.Find("Canvas").transform);
+    }
+    
 }
